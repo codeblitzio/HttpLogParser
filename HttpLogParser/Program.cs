@@ -1,11 +1,44 @@
+using Hellang.Middleware.ProblemDetails;
+using HttpLogParser.Loaders;
+using HttpLogParser.Models;
+using HttpLogParser.Parsers;
+using HttpLogParser.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using System.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.Configure<AppOptions>(builder.Configuration.GetSection("App"));
+
+// configure exception handling middleware
+builder.Services.AddProblemDetails(options =>
+{
+    options.IncludeExceptionDetails = (ctx, ex) => false;
+    options.ShouldLogUnhandledException = (context, ex, problem) => false;
+    options.GetTraceId = ctx => null;
+
+    options.Map<Exception>(ex => new ProblemDetails
+    {
+        Title = "Internal Server Error",
+        Status = (int)HttpStatusCode.InternalServerError,
+        Detail = "Oops, something went wrong"
+    });
+});
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
+builder.Services.AddTransient<ILoader, FileSystemLoader>();
+builder.Services.AddTransient<IRepository, InMemoryRepository>();
+builder.Services.AddTransient<IParser, RegexParser>();
+
 var app = builder.Build();
+
+app.UseProblemDetails();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -16,29 +49,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapControllers();
 
-app.MapGet("/weatherforecast", () =>
+// use Minimal API endpoints
+app.MapGet("/HttpLogReport", async (IMediator mediator, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var result = await mediator.Send(new GetHttpLogReportQuery(), cancellationToken);
+    return Results.Ok(result);
 })
-.WithName("GetWeatherForecast")
+.WithName("GetHttpLogReport")
 .WithOpenApi();
 
+// let's rock!
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
