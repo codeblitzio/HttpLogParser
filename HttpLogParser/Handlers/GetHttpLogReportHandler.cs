@@ -7,13 +7,13 @@ using Microsoft.Extensions.Options;
 
 namespace HttpLogParser.Handlers;
 
-public class GetHttpLogReportHandler : IRequestHandler<GetHttpLogReportQuery, HttpLogReport>
+public class GetHttpLogReportHandler : IRequestHandler<HttpLogReportQuery, HttpLogReport>
 {
-        readonly ILoader _loader;
-        readonly IRepository _repository;
-        readonly IParser _parser;
-        readonly IOptions<AppOptions> _options;
-        readonly ILogger<GetHttpLogReportHandler> _logger;
+    readonly ILoader _loader;
+    readonly IRepository _repository;
+    readonly IParser _parser;
+    readonly IOptions<AppOptions> _options;
+    readonly ILogger<GetHttpLogReportHandler> _logger;
 
     public GetHttpLogReportHandler(ILoader loader,  IRepository repository,  IParser parser, IOptions<AppOptions> options,  ILogger<GetHttpLogReportHandler> logger)
     {
@@ -24,7 +24,7 @@ public class GetHttpLogReportHandler : IRequestHandler<GetHttpLogReportQuery, Ht
         _logger = logger;
     }
 
-    public async Task<HttpLogReport> Handle(GetHttpLogReportQuery request, CancellationToken cancellationToken)
+    public async Task<HttpLogReport> Handle(HttpLogReportQuery request, CancellationToken cancellationToken)
     {
         var uri = _options.Value.HttpLogUri;
 
@@ -40,14 +40,12 @@ public class GetHttpLogReportHandler : IRequestHandler<GetHttpLogReportQuery, Ht
             }  
         }
 
-        var count = _repository.GetCount;
         var uniqueIps = _repository.GetUniqueIpCount;
         var mostVisitedUrls = _repository.MostVisitedUrls;
         var mostActvieIps = _repository.MostActiveIps;
 
         return await Task.FromResult(new HttpLogReport
         {
-            Count = count,
             UniqueIpAdresses = uniqueIps,
             MostVisitedUrls = mostVisitedUrls,
             MostActiveIps = mostActvieIps

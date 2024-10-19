@@ -54,7 +54,7 @@ app.MapControllers();
 // use Minimal API endpoints
 app.MapGet("/HttpLogReport", async (IMediator mediator, ILogger<Program> logger, CancellationToken cancellationToken) =>
 {
-    var result = await mediator.Send(new GetHttpLogReportQuery(), cancellationToken);
+    var result = await mediator.Send(new HttpLogReportQuery(), cancellationToken);
     return Results.Ok(result);
 })
 .WithName("GetHttpLogReport")

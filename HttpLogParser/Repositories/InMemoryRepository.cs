@@ -4,9 +4,14 @@ namespace HttpLogParser.Repositories;
 
 public class InMemoryRepository : IRepository
 {
+    readonly ILogger<InMemoryRepository> _logger;
+    
     private List<HttpLogEntry> _httpLogEntries = [];
 
-    public int GetCount => _httpLogEntries.Count();
+    public InMemoryRepository(ILogger<InMemoryRepository> logger)
+    {
+        _logger = logger;
+    }
 
     public int GetUniqueIpCount => _httpLogEntries.GroupBy(x => x.Ip).Count();
 

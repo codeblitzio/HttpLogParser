@@ -1,6 +1,3 @@
-using HttpLogParser.Models;
-using Microsoft.Extensions.Options;
-
 namespace HttpLogParser.Loaders;
 
 public class FileSystemLoader : ILoader

@@ -5,6 +5,13 @@ namespace HttpLogParser.Parsers;
 
 public class RegexParser : IParser
 {
+    readonly ILogger<RegexParser> _logger;
+
+    public RegexParser(ILogger<RegexParser> logger)
+    {
+        _logger = logger;
+    }
+
     public HttpLogEntry Parse(string input)
     {
         HttpLogEntry result = null;

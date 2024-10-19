@@ -7,5 +7,4 @@ public class HttpLogReport
     public IEnumerable<string> MostVisitedUrls {get; set; }
     
     public IEnumerable<string> MostActiveIps {get; set; }
-    public int Count {get; set; }
 }
