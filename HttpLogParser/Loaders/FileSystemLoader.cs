@@ -9,9 +9,9 @@ public class FileSystemLoader : ILoader
         _logger = logger;
     }
 
-    public IEnumerable<string> Load(string uri)
+    public async Task<IEnumerable<string>> Load(string uri, CancellationToken cancellationToken)
     {
-        var lines = File.ReadAllLines(uri);
+        var lines = await File.ReadAllLinesAsync(uri, cancellationToken);
 
         return lines;
     }

@@ -1,6 +1,6 @@
 @HttpLogParser_HostAddress = http://localhost:5076
 
-GET {{HttpLogParser_HostAddress}}/weatherforecast/
+GET {{HttpLogParser_HostAddress}}/HttpLogReport/
 Accept: application/json
 
 ###

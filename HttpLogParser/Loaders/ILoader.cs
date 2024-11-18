@@ -2,5 +2,5 @@ namespace HttpLogParser.Loaders;
 
 public interface ILoader
 {
-    public IEnumerable<string> Load(string uri);
+    public Task<IEnumerable<string>> Load(string uri, CancellationToken cancellationToken);
 }

@@ -28,7 +28,7 @@ public class GetHttpLogReportHandler : IRequestHandler<HttpLogReportQuery, HttpL
     {
         var uri = _options.Value.HttpLogUri;
 
-        var lines = _loader.Load(uri);
+        var lines = await _loader.Load(uri, cancellationToken);
 
         foreach (var line in lines)
         {
@@ -42,13 +42,13 @@ public class GetHttpLogReportHandler : IRequestHandler<HttpLogReportQuery, HttpL
 
         var uniqueIps = _repository.GetUniqueIpCount;
         var mostVisitedUrls = _repository.MostVisitedUrls;
-        var mostActvieIps = _repository.MostActiveIps;
+        var mostActiveIps = _repository.MostActiveIps;
 
-        return await Task.FromResult(new HttpLogReport
+        return new HttpLogReport
         {
             UniqueIpAdresses = uniqueIps,
             MostVisitedUrls = mostVisitedUrls,
-            MostActiveIps = mostActvieIps
-        });
+            MostActiveIps = mostActiveIps
+        };
     }
 }
